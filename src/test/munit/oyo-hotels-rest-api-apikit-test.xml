@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd ">
+    <munit:config name="oyo-hotels-rest-api-apikit-test.xml" />
+    <http:request-config name="HTTP_Request_Configuration" basePath="/api">
+        <http:request-connection host="localhost" port="8081" />
+    </http:request-config>
+    <munit:test name="post:\hotels:application\json:oyo-hotels-rest-api-config-201-application\json-FlowTest" description="Verifying functionality of [post:\hotels:application\json:oyo-hotels-rest-api-config-201-application\json]">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="oyo-hotels-rest-api-main" />
+            <munit:enable-flow-source value="post:\hotels:application\json:oyo-hotels-rest-api-config" />
+        </munit:enable-flow-sources>
+        <munit:behavior>
+            <set-payload value="#[MunitTools::getResourceAsString('scaffolder/request/post_hotels_application_json.json')]" />
+        </munit:behavior>
+        <munit:execution>
+            <http:request config-ref="HTTP_Request_Configuration" method="POST" path="/hotels">
+                <http:headers>#[{"Accept":"application/json","Content-Type":"application/json"}]</http:headers>
+            </http:request>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(201)]" message="The HTTP Status code is not correct!" doc:name="Assert That Status Code is 201" />
+            <munit-tools:assert-that expression="#[output application/java ---write(payload, 'application/json') as String]" is="#[MunitTools::equalTo(MunitTools::getResourceAsString('scaffolder/response/post_201_hotels_application_json.json'))]" message="The response payload is not correct!" doc:name="Assert That - Payload is Expected" />
+        </munit:validation>
+    </munit:test>
+    <munit:test name="get:\hotels:oyo-hotels-rest-api-config-200-application\json-FlowTest" description="Verifying functionality of [get:\hotels:oyo-hotels-rest-api-config-200-application\json]">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="oyo-hotels-rest-api-main" />
+            <munit:enable-flow-source value="get:\hotels:oyo-hotels-rest-api-config" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <http:request config-ref="HTTP_Request_Configuration" method="GET" path="/hotels">
+                <http:headers>#[{"Accept":"application/json"}]</http:headers>
+                <http:query-params>#[{"city":""}]</http:query-params>
+            </http:request>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(200)]" message="The HTTP Status code is not correct!" doc:name="Assert That Status Code is 200" />
+            <munit-tools:assert-that expression="#[output application/java ---write(payload, 'application/json') as String]" is="#[MunitTools::equalTo(MunitTools::getResourceAsString('scaffolder/response/get_200_hotels_application_json.json'))]" message="The response payload is not correct!" doc:name="Assert That - Payload is Expected" />
+        </munit:validation>
+    </munit:test>
+    <munit:test name="put:\hotels\(hotelId):application\json:oyo-hotels-rest-api-config-200-application\json-FlowTest" description="Verifying functionality of [put:\hotels\(hotelId):application\json:oyo-hotels-rest-api-config-200-application\json]">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="oyo-hotels-rest-api-main" />
+            <munit:enable-flow-source value="put:\hotels\(hotelId):application\json:oyo-hotels-rest-api-config" />
+        </munit:enable-flow-sources>
+        <munit:behavior>
+            <set-payload value="#[MunitTools::getResourceAsString('scaffolder/request/put_hotels_{hotelid}_application_json.json')]" />
+            <set-variable variableName="hotelId" value="#['null']" doc:name="hotelId" />
+        </munit:behavior>
+        <munit:execution>
+            <http:request config-ref="HTTP_Request_Configuration" method="PUT" path="#['/hotels/$(vars.hotelId)']">
+                <http:headers>#[{"Accept":"application/json","Content-Type":"application/json"}]</http:headers>
+            </http:request>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(200)]" message="The HTTP Status code is not correct!" doc:name="Assert That Status Code is 200" />
+            <munit-tools:assert-that expression="#[output application/java ---write(payload, 'application/json') as String]" is="#[MunitTools::equalTo(MunitTools::getResourceAsString('scaffolder/response/put_200_hotels_{hotelid}_application_json.json'))]" message="The response payload is not correct!" doc:name="Assert That - Payload is Expected" />
+        </munit:validation>
+    </munit:test>
+    <munit:test name="delete:\hotels\(hotelId):oyo-hotels-rest-api-config-200-application\json-FlowTest" description="Verifying functionality of [delete:\hotels\(hotelId):oyo-hotels-rest-api-config-200-application\json]">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="oyo-hotels-rest-api-main" />
+            <munit:enable-flow-source value="delete:\hotels\(hotelId):oyo-hotels-rest-api-config" />
+        </munit:enable-flow-sources>
+        <munit:behavior>
+            <set-variable variableName="hotelId" value="#['null']" doc:name="hotelId" />
+        </munit:behavior>
+        <munit:execution>
+            <http:request config-ref="HTTP_Request_Configuration" method="DELETE" path="#['/hotels/$(vars.hotelId)']">
+                <http:headers>#[{"Accept":"application/json"}]</http:headers>
+            </http:request>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(200)]" message="The HTTP Status code is not correct!" doc:name="Assert That Status Code is 200" />
+            <munit-tools:assert-that expression="#[output application/java ---write(payload, 'application/json') as String]" is="#[MunitTools::equalTo(MunitTools::getResourceAsString('scaffolder/response/delete_200_hotels_{hotelid}_application_json.json'))]" message="The response payload is not correct!" doc:name="Assert That - Payload is Expected" />
+        </munit:validation>
+    </munit:test>
+    <munit:test name="get:\hotels\(hotelId):oyo-hotels-rest-api-config-200-application\json-FlowTest" description="Verifying functionality of [get:\hotels\(hotelId):oyo-hotels-rest-api-config-200-application\json]">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="oyo-hotels-rest-api-main" />
+            <munit:enable-flow-source value="get:\hotels\(hotelId):oyo-hotels-rest-api-config" />
+        </munit:enable-flow-sources>
+        <munit:behavior>
+            <set-variable variableName="hotelId" value="#['null']" doc:name="hotelId" />
+        </munit:behavior>
+        <munit:execution>
+            <http:request config-ref="HTTP_Request_Configuration" method="GET" path="#['/hotels/$(vars.hotelId)']">
+                <http:headers>#[{"Accept":"application/json"}]</http:headers>
+            </http:request>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(200)]" message="The HTTP Status code is not correct!" doc:name="Assert That Status Code is 200" />
+            <munit-tools:assert-that expression="#[output application/java ---write(payload, 'application/json') as String]" is="#[MunitTools::equalTo(MunitTools::getResourceAsString('scaffolder/response/get_200_hotels_{hotelid}_application_json.json'))]" message="The response payload is not correct!" doc:name="Assert That - Payload is Expected" />
+        </munit:validation>
+    </munit:test>
+</mule>

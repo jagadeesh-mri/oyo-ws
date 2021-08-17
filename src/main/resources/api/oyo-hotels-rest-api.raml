@@ -1,0 +1,92 @@
+#%RAML 1.0
+title: OYO Hotels REST API
+
+types:
+  Hotel: !include datatypes/HotelDataType.raml
+
+/hotels:
+  get:
+    displayName: Get All hotels from a city
+    description: Get All hotels from a city
+    queryParameters:
+      city:
+        type: string
+        required: true
+        enum: 
+          - Bangalore
+          - Hyderabad
+          - Delhi
+          - Mumbai
+      startDate:
+        type: string #06 Mar 2021
+        pattern: ^(([0-9])|([0-2][0-9])|([3][0-1])) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}$
+        required: false
+        example: 06 Mar 2021
+      endDate:
+        type: string
+        required: false
+        pattern: ^(([0-9])|([0-2][0-9])|([3][0-1])) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}$
+        example: 07 Mar 2021
+      priceUnder:
+        type: integer
+        maximum: 100000
+        minimum: 500
+        required: false
+        example: 5000
+        default: 10000
+    responses:
+      200:
+        body: 
+          application/json:
+            example: !include examples/HotelsExample.raml
+            type: Hotel[]
+  post:
+    displayName: Add a Hotel
+    description: Add a Hotel
+    body:
+      application/json:
+        example: !include examples/HotelExample.raml
+        type: Hotel
+    responses:
+      201:
+        body:
+          application/json:
+            example:
+              message: Hotel has been created
+  /{hotelId}:
+    get:
+      displayName: Get Hotel By ID
+      description: Get Hotel By ID
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include examples/HotelExample.raml
+              type: Hotel
+    put:
+      displayName: Update Hotel By ID
+      description: Update Hotel By ID
+      body:
+        application/json:
+          example: !include examples/HotelExample.raml
+          type: Hotel
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                message: Hotel has been updated
+    delete:
+      displayName: Delete Hotel By ID
+      description: Delete Hotel By ID
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                message: Hotel with Id 123 has been deleted
+        
+
+
+
+
